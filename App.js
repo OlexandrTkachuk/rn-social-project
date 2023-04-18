@@ -1,20 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// system
+import { useCallback } from "react";
+import { StatusBar } from "expo-status-bar";
+
+// fonts
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+
+// components
+import LoginScreen from "./screens/authScreens/LoginScreen";
+import RegistrationScreen from "./screens/authScreens/RegistrationScreen";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+	// load fonts
+	const [fontsLoaded] = useFonts({
+		"Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
+		"Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+		"Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+	});
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+	const onLayoutRootView = useCallback(async () => {
+		if (fontsLoaded) {
+			await SplashScreen.hideAsync();
+		}
+	}, [fontsLoaded]);
+
+	if (!fontsLoaded) {
+		return null;
+	}
+
+	onLayoutRootView();
+
+	return (
+		<>
+			{/* <LoginScreen /> */}
+			<RegistrationScreen />
+			<StatusBar style="auto" />
+		</>
+	);
+}
