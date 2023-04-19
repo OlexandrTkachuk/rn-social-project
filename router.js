@@ -49,6 +49,7 @@ const useRoute = (isAuth) => {
 					backdropFilter: "blur(13.5914px)",
 					backgroundColor: "#FFFFFF",
 					paddingTop: 9,
+					marginBottom: 34,
 					paddingHorizontal: 80,
 				},
 			}}
