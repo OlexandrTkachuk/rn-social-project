@@ -17,7 +17,7 @@ import {
 // assets
 const backgroundImage = require("../../images/background.png");
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -78,7 +78,10 @@ const LoginScreen = () => {
 							<Text style={styles.text}>Войти</Text>
 						</TouchableOpacity>
 
-						<Text onPress={() => {}} style={styles.info}>
+						<Text
+							onPress={() => navigation.navigate("Registration")}
+							style={styles.info}
+						>
 							Нет аккаунта? Зарегистрироваться
 						</Text>
 					</View>

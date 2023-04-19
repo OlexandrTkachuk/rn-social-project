@@ -18,7 +18,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 const backgroundImage = require("../../images/background.png");
 
-const RegistrationScreen = () => {
+const RegistrationScreen = ({ navigation }) => {
 	const [login, setLogin] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -118,7 +118,10 @@ const RegistrationScreen = () => {
 						>
 							<Text style={styles.text}>Регистрация</Text>
 						</Pressable>
-						<Text onPress={() => {}} style={styles.info}>
+						<Text
+							onPress={() => navigation.navigate("Login")}
+							style={styles.info}
+						>
 							Уже есть аккаунт ? Войти
 						</Text>
 					</View>

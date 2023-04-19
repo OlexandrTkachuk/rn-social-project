@@ -6,13 +6,15 @@ import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
-// components
-import LoginScreen from "./screens/authScreens/LoginScreen";
-import RegistrationScreen from "./screens/authScreens/RegistrationScreen";
+// navigation
+import { NavigationContainer } from "@react-navigation/native";
+import useRoute from "./router";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+	const routing = useRoute({});
+
 	// load fonts
 	const [fontsLoaded] = useFonts({
 		"Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
@@ -33,10 +35,9 @@ export default function App() {
 	onLayoutRootView();
 
 	return (
-		<>
-			{/* <LoginScreen /> */}
-			<RegistrationScreen />
+		<NavigationContainer>
+			{routing}
 			<StatusBar style="auto" />
-		</>
+		</NavigationContainer>
 	);
 }
