@@ -48,8 +48,6 @@ const styles = StyleSheet.create({
 		position: "relative",
 		paddingTop: 55,
 		paddingBottom: 11,
-		boxShadow: "0px 0.5px 0px rgba(0, 0, 0, 0.3)",
-		backdropFilter: "blur(13.5914px)",
 		borderBottomWidth: 1,
 		borderBottomColor: "#BDBDBD",
 	},
