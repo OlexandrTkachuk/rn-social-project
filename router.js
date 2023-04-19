@@ -80,7 +80,7 @@ const useRoute = (isAuth) => {
 						borderRadius: 20,
 						marginHorizontal: 15,
 					},
-					// tabBarStyle: { display: "none" },
+					tabBarStyle: { display: "none" },
 				}}
 				name="Create"
 				component={CreatePostsScreen}
