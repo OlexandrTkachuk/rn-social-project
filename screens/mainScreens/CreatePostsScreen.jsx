@@ -6,21 +6,29 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
-	Alert,
+	ImageBackground,
 	Platform,
 	Keyboard,
 	KeyboardAvoidingView,
 	TextInput,
+	Alert,
 } from "react-native";
+
+// image picker
+import * as ImagePicker from "expo-image-picker";
 
 // icons
 import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
+
+// components
+import CameraScreen from "../components/Camera";
 
 const CreatePostsScreen = ({ navigation }) => {
 	const [name, setName] = useState("");
 	const [location, setLocation] = useState("");
 	const [photo, setPhoto] = useState(null);
 	const [isKeyboardShown, setIsKeyboardShown] = useState(false);
+	const [isActiveCamera, setIsActiveCamera] = useState(false);
 
 	const condition = name.trim() !== "" && location.trim() !== "";
 
@@ -48,9 +56,52 @@ const CreatePostsScreen = ({ navigation }) => {
 		setPhoto("");
 	};
 
+	const hideKeyboard = () => {
+		setIsKeyboardShown(!isKeyboardShown);
+		Keyboard.dismiss();
+	};
+
+	const hideCamera = () => {
+		setIsActiveCamera(false);
+	};
+
+	const getPhoto = (uri) => {
+		setPhoto(uri);
+		setIsActiveCamera(false);
+	};
+
+	const handleFormSubmit = async () => {
+		if (name.trim() === "" || location.trim() === "") {
+			Alert.alert("Заполните все поля");
+			return;
+		}
+
+		console.log({
+			uri: photo,
+			name,
+			location,
+		});
+
+		clearForm();
+		await navigation.navigate("Posts");
+	};
+
+	const pickImage = async () => {
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.All,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		const source = result.assets[0].uri;
+
+		setPhoto(source);
+	};
+
 	const loadPhoto = () => {
 		return (
-			<TouchableOpacity activeOpacity={0.7} onPress={() => {}}>
+			<TouchableOpacity activeOpacity={0.7} onPress={pickImage}>
 				<Text style={styles.cameraText}>Загрузите фото</Text>
 			</TouchableOpacity>
 		);
@@ -58,18 +109,16 @@ const CreatePostsScreen = ({ navigation }) => {
 
 	const changePhoto = () => {
 		return (
-			<TouchableOpacity activeOpacity={0.7} onPress={() => {}}>
+			<TouchableOpacity
+				activeOpacity={0.7}
+				onPress={() => setIsActiveCamera(true)}
+			>
 				<Text style={styles.cameraText}>Редактировать фото</Text>
 			</TouchableOpacity>
 		);
 	};
 
-	const hideKeyboard = () => {
-		setIsKeyboardShown(false);
-		Keyboard.dismiss();
-	};
-
-	return (
+	return !isActiveCamera ? (
 		<TouchableWithoutFeedback onPress={hideKeyboard}>
 			<View style={styles.container}>
 				<View style={styles.header}>
@@ -90,18 +139,32 @@ const CreatePostsScreen = ({ navigation }) => {
 					</TouchableOpacity>
 				</View>
 
-				<View style={styles.cameraContainer}>
-					<TouchableOpacity
-						style={styles.cameraIconWrapper}
-						activeOpacity={0.6}
-					>
-						<MaterialIcons
-							name="camera-alt"
-							size={32}
-							color="#BDBDBD"
-						/>
-					</TouchableOpacity>
-				</View>
+				{!photo ? (
+					<View style={styles.cameraContainer}>
+						<TouchableOpacity
+							style={styles.cameraIconWrapper}
+							activeOpacity={0.6}
+							onPress={() => setIsActiveCamera(true)}
+						>
+							<MaterialIcons
+								name="camera-alt"
+								size={32}
+								color="#BDBDBD"
+							/>
+						</TouchableOpacity>
+					</View>
+				) : (
+					<ImageBackground
+						style={{
+							...styles.cameraContainer,
+							overflow: "hidden",
+							minHeight: isKeyboardShown ? 200 : 242,
+						}}
+						source={{
+							uri: photo,
+						}}
+					/>
+				)}
 
 				{!photo ? loadPhoto() : changePhoto()}
 
@@ -143,6 +206,7 @@ const CreatePostsScreen = ({ navigation }) => {
 						backgroundColor: condition ? "#FF6C00" : "#F6F6F6",
 					}}
 					activeOpacity={0.8}
+					onPress={handleFormSubmit}
 				>
 					<Text
 						style={{
@@ -170,6 +234,8 @@ const CreatePostsScreen = ({ navigation }) => {
 				</View>
 			</View>
 		</TouchableWithoutFeedback>
+	) : (
+		<CameraScreen onClose={hideCamera} onSnap={getPhoto} />
 	);
 };
 
@@ -223,6 +289,12 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		lineHeight: 19,
 		marginBottom: 48,
+	},
+	photoIcon: {
+		padding: 20,
+		backgroundColor: "#FFF",
+		borderRadius: 100,
+		zIndex: 999,
 	},
 	form: {
 		width: "100%",
