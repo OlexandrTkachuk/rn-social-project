@@ -32,6 +32,9 @@ const CreatePostsScreen = ({ navigation }) => {
 
 	const condition = name.trim() !== "" && location.trim() !== "";
 
+	const loadPhotoText = !isKeyboardShown && !photo;
+	const changePhotoText = !isKeyboardShown && photo;
+
 	useEffect(() => {
 		const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
 			setIsKeyboardShown(true);
@@ -57,7 +60,7 @@ const CreatePostsScreen = ({ navigation }) => {
 	};
 
 	const hideKeyboard = () => {
-		setIsKeyboardShown(!isKeyboardShown);
+		setIsKeyboardShown(false);
 		Keyboard.dismiss();
 	};
 
@@ -76,14 +79,9 @@ const CreatePostsScreen = ({ navigation }) => {
 			return;
 		}
 
-		console.log({
-			uri: photo,
-			name,
-			location,
-		});
-
 		clearForm();
-		await navigation.navigate("Posts");
+
+		await navigation.navigate("Posts", { photo, name, location });
 	};
 
 	const pickImage = async () => {
@@ -97,25 +95,6 @@ const CreatePostsScreen = ({ navigation }) => {
 		const source = result.assets[0].uri;
 
 		setPhoto(source);
-	};
-
-	const loadPhoto = () => {
-		return (
-			<TouchableOpacity activeOpacity={0.7} onPress={pickImage}>
-				<Text style={styles.cameraText}>Загрузите фото</Text>
-			</TouchableOpacity>
-		);
-	};
-
-	const changePhoto = () => {
-		return (
-			<TouchableOpacity
-				activeOpacity={0.7}
-				onPress={() => setIsActiveCamera(true)}
-			>
-				<Text style={styles.cameraText}>Редактировать фото</Text>
-			</TouchableOpacity>
-		);
 	};
 
 	return !isActiveCamera ? (
@@ -140,7 +119,12 @@ const CreatePostsScreen = ({ navigation }) => {
 				</View>
 
 				{!photo ? (
-					<View style={styles.cameraContainer}>
+					<View
+						style={{
+							...styles.cameraContainer,
+							marginBottom: isKeyboardShown ? 20 : 8,
+						}}
+					>
 						<TouchableOpacity
 							style={styles.cameraIconWrapper}
 							activeOpacity={0.6}
@@ -158,7 +142,8 @@ const CreatePostsScreen = ({ navigation }) => {
 						style={{
 							...styles.cameraContainer,
 							overflow: "hidden",
-							minHeight: isKeyboardShown ? 200 : 242,
+							minHeight: 242,
+							marginBottom: isKeyboardShown ? 20 : 8,
 						}}
 						source={{
 							uri: photo,
@@ -166,7 +151,35 @@ const CreatePostsScreen = ({ navigation }) => {
 					/>
 				)}
 
-				{!photo ? loadPhoto() : changePhoto()}
+				{loadPhotoText && (
+					<TouchableOpacity
+						activeOpacity={0.7}
+						onPress={pickImage}
+						style={{
+							...styles.cameraTextContainer,
+							marginBottom: isKeyboardShown ? 20 : 48,
+						}}
+					>
+						<Text style={styles.cameraText} onPress={pickImage}>
+							Загрузите фото
+						</Text>
+					</TouchableOpacity>
+				)}
+
+				{changePhotoText && (
+					<TouchableOpacity
+						activeOpacity={0.7}
+						onPress={() => setIsActiveCamera(true)}
+						style={{
+							...styles.cameraTextContainer,
+							marginBottom: isKeyboardShown ? 20 : 48,
+						}}
+					>
+						<Text style={styles.cameraText}>
+							Редактировать фото
+						</Text>
+					</TouchableOpacity>
+				)}
 
 				<KeyboardAvoidingView
 					behavior={Platform.OS == "ios" ? "padding" : "height"}
@@ -179,6 +192,7 @@ const CreatePostsScreen = ({ navigation }) => {
 							placeholder="Название..."
 							placeholderTextColor="#BDBDBD"
 							style={{ ...styles.input, ...styles.inputName }}
+							onFocus={() => setIsKeyboardShown(true)}
 						/>
 					</View>
 
@@ -196,6 +210,7 @@ const CreatePostsScreen = ({ navigation }) => {
 							placeholder="Местность..."
 							placeholderTextColor="#BDBDBD"
 							style={{ ...styles.input, ...styles.inputLocation }}
+							onFocus={() => setIsKeyboardShown(true)}
 						/>
 					</View>
 				</KeyboardAvoidingView>
@@ -265,7 +280,6 @@ const styles = StyleSheet.create({
 	},
 	cameraContainer: {
 		marginTop: 32,
-		marginBottom: 8,
 		marginHorizontal: 16,
 		paddingVertical: 90,
 		backgroundColor: "#F6F6F6",
@@ -282,13 +296,15 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
+	cameraTextContainer: {
+		maxWidth: 220,
+	},
 	cameraText: {
 		color: "#BDBDBD",
 		marginHorizontal: 16,
 		fontFamily: "Roboto-Regular",
 		fontSize: 16,
 		lineHeight: 19,
-		marginBottom: 48,
 	},
 	photoIcon: {
 		padding: 20,
@@ -298,11 +314,8 @@ const styles = StyleSheet.create({
 	},
 	form: {
 		width: "100%",
-		justifyContent: "flex-end",
 		backgroundColor: "#FFFFFF",
 		paddingHorizontal: 16,
-		borderTopLeftRadius: 25,
-		borderTopRightRadius: 25,
 	},
 	input: {
 		width: "100%",
