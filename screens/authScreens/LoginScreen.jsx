@@ -1,5 +1,6 @@
 // system
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
 	StyleSheet,
 	Text,
@@ -14,10 +15,15 @@ import {
 	Keyboard,
 } from "react-native";
 
+// redux
+import { authSignIn } from "../../redux/auth/auth-actions";
+
 // assets
 const backgroundImage = require("../../images/background.png");
 
 const LoginScreen = ({ navigation }) => {
+	const dispatch = useDispatch();
+
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -30,7 +36,8 @@ const LoginScreen = ({ navigation }) => {
 			return;
 		}
 
-		console.log("email", email, "password", password);
+		dispatch(authSignIn({ email, password }));
+
 		setEmail("");
 		setPassword("");
 	};

@@ -1,5 +1,6 @@
 // system
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
 	View,
 	Text,
@@ -14,8 +15,21 @@ import {
 	Alert,
 } from "react-native";
 
+// firebase
+import firebase from "../../firebase/config";
+
+// redux
+import {
+	selectUserId,
+	selectUserName,
+	selectUserPhoto,
+} from "../../redux/auth/auth-selectors";
+
 // image picker
 import * as ImagePicker from "expo-image-picker";
+
+// Location
+import * as Location from "expo-location";
 
 // icons
 import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
@@ -25,16 +39,25 @@ import CameraScreen from "../components/Camera";
 
 const CreatePostsScreen = ({ navigation }) => {
 	const [name, setName] = useState("");
-	const [location, setLocation] = useState("");
 	const [photo, setPhoto] = useState(null);
+	const [location, setLocation] = useState("");
+	const [errorMsg, setErrorMsg] = useState(null);
+	const [geo, setGeo] = useState(null);
+	const [geoData, setGeoData] = useState({});
+
+	const [uploading, setUploading] = useState(false);
 	const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 	const [isActiveCamera, setIsActiveCamera] = useState(false);
 
-	const condition = name.trim() !== "" && location.trim() !== "";
+	const userId = useSelector(selectUserId);
+	const userName = useSelector(selectUserName);
+	const userPhoto = useSelector(selectUserPhoto);
 
+	const condition = name.trim() !== "" && location.trim() !== "";
 	const loadPhotoText = !isKeyboardShown && !photo;
 	const changePhotoText = !isKeyboardShown && photo;
 
+	// keyboard
 	useEffect(() => {
 		const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
 			setIsKeyboardShown(true);
@@ -48,6 +71,24 @@ const CreatePostsScreen = ({ navigation }) => {
 			showSubscription.remove();
 			hideSubscription.remove();
 		};
+	}, []);
+
+	// location
+	useEffect(() => {
+		(async () => {
+			let { status } = await Location.requestForegroundPermissionsAsync();
+			if (status !== "granted") {
+				setErrorMsg("Permission to access location was denied");
+				return;
+			}
+
+			let location = await Location.getCurrentPositionAsync({});
+			setGeo(location);
+			setGeoData({
+				latitude: location.coords.latitude,
+				longitude: location.coords.longitude,
+			});
+		})();
 	}, []);
 
 	const handleNameChange = (value) => setName(value);
@@ -73,15 +114,57 @@ const CreatePostsScreen = ({ navigation }) => {
 		setIsActiveCamera(false);
 	};
 
+	const uploadPostToServer = async () => {
+		const date = Date.now().toString();
+		const photo = await uploadImageToStoradge();
+
+		const createPost = await firebase.firestore().collection("Posts").add({
+			photo,
+			location,
+			name,
+			geo: geo.coords,
+			userId,
+			userName,
+			userPhoto,
+			date,
+		});
+	};
+
+	const uploadImageToStoradge = async () => {
+		setUploading(true);
+
+		const uniquePostId = Date.now().toString();
+
+		const response = await fetch(photo);
+		const blob = await response.blob();
+		var ref = firebase.storage().ref(`postImage/${uniquePostId}`).put(blob);
+
+		try {
+			await ref;
+		} catch (error) {
+			console.log(error);
+		}
+
+		const processedPhoto = await firebase
+			.storage()
+			.ref("postImage")
+			.child(uniquePostId)
+			.getDownloadURL();
+
+		setUploading(false);
+
+		return processedPhoto;
+	};
+
 	const handleFormSubmit = async () => {
 		if (name.trim() === "" || location.trim() === "") {
 			Alert.alert("Заполните все поля");
 			return;
 		}
 
+		uploadPostToServer();
 		clearForm();
-
-		await navigation.navigate("Posts", { photo, name, location });
+		await navigation.navigate("Default");
 	};
 
 	const pickImage = async () => {

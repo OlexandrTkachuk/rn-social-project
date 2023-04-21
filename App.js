@@ -2,19 +2,20 @@
 import { useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 
+// redux
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+
 // fonts
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
-// navigation
-import { NavigationContainer } from "@react-navigation/native";
-import useRoute from "./router";
+// components
+import Main from "./screens/components/Main";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-	const routing = useRoute({});
-
 	// load fonts
 	const [fontsLoaded] = useFonts({
 		"Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
@@ -35,9 +36,9 @@ export default function App() {
 	onLayoutRootView();
 
 	return (
-		<NavigationContainer>
-			{routing}
+		<Provider store={store}>
+			<Main />
 			<StatusBar style="auto" />
-		</NavigationContainer>
+		</Provider>
 	);
 }
