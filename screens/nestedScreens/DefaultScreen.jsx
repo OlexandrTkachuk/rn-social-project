@@ -22,9 +22,6 @@ import { Feather } from "@expo/vector-icons";
 const DefaultScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const [posts, setPosts] = useState([]);
-	const [commentsCount, setCommentsCount] = useState(0);
-
-	console.log(posts);
 
 	useEffect(() => {
 		getAllPosts();
@@ -67,20 +64,7 @@ const DefaultScreen = ({ navigation }) => {
 				data={posts}
 				keyExtractor={(item, index) => index.toString()}
 				renderItem={({ item }) => {
-					// const getCount = async () => {
-					// 	await firebase
-					// 		.firestore()
-					// 		.collection("Posts")
-					// 		.doc(item.id)
-					// 		.collection("Comments")
-					// 		.onSnapshot((data) => {
-					// 			console.log(data.docs.length);
-					// 			return count;
-					// 		});
-					// };
-
-					// getCount();
-
+					console.log(item.id);
 					return (
 						<View style={styles.gallery}>
 							<View style={styles.userContainer}>
@@ -126,7 +110,19 @@ const DefaultScreen = ({ navigation }) => {
 										/>
 
 										<Text style={styles.commentText}>
-											0
+											{/* {() => {
+												firebase
+													.firestore()
+													.collection("Posts")
+													.doc(item.id)
+													.collection("Comments")
+													.onSnapshot((data) => {
+														let count =
+															data.docs.length;
+														return count;
+													});
+											}} */}
+											count
 										</Text>
 									</TouchableOpacity>
 

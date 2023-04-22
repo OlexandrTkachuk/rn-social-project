@@ -30,7 +30,6 @@ const CommentsScreen = ({ route, navigation }) => {
 
 	const [comment, setComment] = useState("");
 	const [allComments, setAllComments] = useState([]);
-	const [commentsCount, setCommentsCount] = useState(0);
 
 	const flatListRef = useRef(null);
 
@@ -48,7 +47,6 @@ const CommentsScreen = ({ route, navigation }) => {
 			.collection("Comments")
 			.orderBy("date")
 			.onSnapshot((data) => {
-				setCommentsCount(data.docs.length);
 				setAllComments(
 					data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
 				);
@@ -71,92 +69,88 @@ const CommentsScreen = ({ route, navigation }) => {
 	const handleCommentChange = (value) => setComment(value);
 
 	const handleSubmit = () => {
-		createComment();
 		flatListRef.current.scrollToEnd();
+		createComment();
 		setComment("");
+		Keyboard.dismiss();
 	};
 
 	return (
-		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.headerText}>Коментарии</Text>
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Text style={styles.headerText}>Коментарии</Text>
+
+				<TouchableOpacity
+					style={styles.arrowleftIcon}
+					activeOpacity={0.8}
+					onPress={() => {
+						navigation.navigate("Default");
+					}}
+				>
+					<AntDesign
+						name="arrowleft"
+						size={24}
+						color="rgba(33, 33, 33, 0.8)"
+					/>
+				</TouchableOpacity>
+			</View>
+
+			<View style={styles.galleryItem}>
+				<Image
+					source={{
+						uri: image,
+					}}
+					style={styles.galleryItemImage}
+				/>
+			</View>
+
+			<FlatList
+				ref={flatListRef}
+				data={allComments}
+				style={styles.commentContainer}
+				keyExtractor={(item) => item.id}
+				renderItem={({ item }) => (
+					<View style={styles.comment}>
+						<Image
+							source={{ uri: item.userPhoto }}
+							style={styles.userPhoto}
+						/>
+
+						<View style={styles.commentTextWrapper}>
+							<Text style={styles.commentText}>
+								{item.comment}
+							</Text>
+
+							<Text style={styles.commentData}>{item.date}</Text>
+						</View>
+					</View>
+				)}
+			/>
+			<KeyboardAvoidingView
+				behavior={Platform.OS == "ios" ? "padding" : "height"}
+			>
+				<View style={styles.inputContainer}>
+					<TextInput
+						value={comment}
+						onChangeText={handleCommentChange}
+						style={styles.input}
+						placeholder="Комментировать..."
+					/>
 
 					<TouchableOpacity
-						style={styles.arrowleftIcon}
-						activeOpacity={0.8}
-						onPress={() => {
-							navigation.navigate("Default");
-						}}
+						onPress={handleSubmit}
+						style={styles.sendBtn}
 					>
 						<AntDesign
-							name="arrowleft"
+							style={styles.sendIcon}
+							name="arrowup"
 							size={24}
-							color="rgba(33, 33, 33, 0.8)"
+							color="#FFF"
 						/>
 					</TouchableOpacity>
 				</View>
-
-				<View style={styles.galleryItem}>
-					<Image
-						source={{
-							uri: image,
-						}}
-						style={styles.galleryItemImage}
-					/>
-				</View>
-
-				<FlatList
-					ref={flatListRef}
-					data={allComments}
-					style={styles.commentContainer}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => (
-						<View style={styles.comment}>
-							<Image
-								source={{ uri: item.userPhoto }}
-								style={styles.userPhoto}
-							/>
-
-							<View style={styles.commentTextWrapper}>
-								<Text style={styles.commentText}>
-									{item.comment}
-								</Text>
-
-								<Text style={styles.commentData}>
-									{item.date}
-								</Text>
-							</View>
-						</View>
-					)}
-				/>
-
-				<KeyboardAvoidingView
-					behavior={Platform.OS == "ios" ? "padding" : "height"}
-				>
-					<View style={styles.inputContainer}>
-						<TextInput
-							value={comment}
-							onChangeText={handleCommentChange}
-							style={styles.input}
-							placeholder="Комментировать..."
-						/>
-
-						<TouchableOpacity
-							onPress={handleSubmit}
-							style={styles.sendBtn}
-						>
-							<AntDesign
-								style={styles.sendIcon}
-								name="arrowup"
-								size={24}
-								color="#FFF"
-							/>
-						</TouchableOpacity>
-					</View>
-				</KeyboardAvoidingView>
-			</View>
-		</TouchableWithoutFeedback>
+			</KeyboardAvoidingView>
+		</View>
 	);
 };
 

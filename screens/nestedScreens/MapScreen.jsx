@@ -1,10 +1,14 @@
 // system
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 // icons
-import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
-const MapScreen = ({ navigation }) => {
+const MapScreen = ({ route, navigation }) => {
+	const latitude = route.params.geo.latitude;
+	const longitude = route.params.geo.longitude;
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
@@ -24,6 +28,18 @@ const MapScreen = ({ navigation }) => {
 					/>
 				</TouchableOpacity>
 			</View>
+
+			<MapView
+				style={{ flex: 1 }}
+				initialRegion={{
+					latitude,
+					longitude,
+					latitudeDelta: 0.0222,
+					longitudeDelta: 0.0121,
+				}}
+			>
+				<Marker coordinate={{ latitude, longitude }} />
+			</MapView>
 		</View>
 	);
 };
