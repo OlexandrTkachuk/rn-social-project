@@ -19,28 +19,27 @@ import firebase from "../../firebase/config";
 // icons
 import { Feather } from "@expo/vector-icons";
 
-// assets
-const avatar = require("../../images/ken.png");
-
 const DefaultScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const [posts, setPosts] = useState([]);
+	const [commentsCount, setCommentsCount] = useState(0);
+
+	console.log(posts);
+
+	useEffect(() => {
+		getAllPosts();
+	}, []);
 
 	const getAllPosts = async () => {
 		await firebase
 			.firestore()
 			.collection("Posts")
-			// .orderBy("date")
 			.onSnapshot((data) => {
 				setPosts(
 					data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
 				);
 			});
 	};
-
-	useEffect(() => {
-		getAllPosts();
-	}, []);
 
 	const signOut = () => {
 		dispatch(authSignOutUser());
@@ -67,69 +66,94 @@ const DefaultScreen = ({ navigation }) => {
 			<FlatList
 				data={posts}
 				keyExtractor={(item, index) => index.toString()}
-				renderItem={({ item }) => (
-					<View style={styles.gallery}>
-						<View style={styles.userContainer}>
-							<Image
-								source={{ uri: item.userPhoto }}
-								style={styles.avatar}
-							/>
+				renderItem={({ item }) => {
+					// const getCount = async () => {
+					// 	await firebase
+					// 		.firestore()
+					// 		.collection("Posts")
+					// 		.doc(item.id)
+					// 		.collection("Comments")
+					// 		.onSnapshot((data) => {
+					// 			console.log(data.docs.length);
+					// 			return count;
+					// 		});
+					// };
 
-							<View style={styles.userInfo}>
-								<Text style={styles.userName}>
-									{item.userName}
-								</Text>
+					// getCount();
 
-								<Text style={styles.userEmail}>
-									tokyoghoul@mail.com
-								</Text>
-							</View>
-						</View>
+					return (
+						<View style={styles.gallery}>
+							<View style={styles.userContainer}>
+								<Image
+									source={{ uri: item.userPhoto }}
+									style={styles.avatar}
+								/>
 
-						<View style={styles.galleryPost}>
-							<Image
-								source={{ uri: item.photo }}
-								style={styles.postImage}
-							/>
-
-							<Text style={styles.postName}>{item.name}</Text>
-
-							<View style={styles.postInfo}>
-								<TouchableOpacity
-									style={styles.commentWrapper}
-									onPress={() =>
-										navigation.navigate("Comments")
-									}
-								>
-									<Feather
-										name="message-circle"
-										size={24}
-										color="#BDBDBD"
-										style={styles.commentIcon}
-									/>
-
-									<Text style={styles.commentText}>0</Text>
-								</TouchableOpacity>
-
-								<TouchableOpacity
-									style={styles.locationWrapper}
-									onPress={() => navigation.navigate("Map")}
-								>
-									<Feather
-										name="map-pin"
-										size={24}
-										color="#BDBDBD"
-										style={styles.locationIcon}
-									/>
-
-									<Text style={styles.locationText}>
-										{item.location}
+								<View style={styles.userInfo}>
+									<Text style={styles.userName}>
+										{item.userName}
 									</Text>
-								</TouchableOpacity>
+
+									<Text style={styles.userEmail}>
+										tokyoghoul@mail.com
+									</Text>
+								</View>
+							</View>
+
+							<View style={styles.galleryPost}>
+								<Image
+									source={{ uri: item.photo }}
+									style={styles.postImage}
+								/>
+
+								<Text style={styles.postName}>{item.name}</Text>
+
+								<View style={styles.postInfo}>
+									<TouchableOpacity
+										style={styles.commentWrapper}
+										onPress={() =>
+											navigation.navigate("Comments", {
+												postId: item.id,
+												image: item.photo,
+											})
+										}
+									>
+										<Feather
+											name="message-circle"
+											size={24}
+											color="#BDBDBD"
+											style={styles.commentIcon}
+										/>
+
+										<Text style={styles.commentText}>
+											0
+										</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										style={styles.locationWrapper}
+										onPress={() =>
+											navigation.navigate("Map", {
+												geo: item.geo,
+											})
+										}
+									>
+										<Feather
+											name="map-pin"
+											size={24}
+											color="#BDBDBD"
+											style={styles.locationIcon}
+										/>
+
+										<Text style={styles.locationText}>
+											{item.location}
+										</Text>
+									</TouchableOpacity>
+								</View>
 							</View>
 						</View>
-					</View>
-				)}
+					);
+				}}
 			/>
 		</View>
 	);
