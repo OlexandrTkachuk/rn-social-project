@@ -7,7 +7,6 @@ import {
 	StyleSheet,
 	TextInput,
 	TouchableOpacity,
-	TouchableWithoutFeedback,
 	Keyboard,
 	KeyboardAvoidingView,
 	Image,
@@ -69,8 +68,10 @@ const CommentsScreen = ({ route, navigation }) => {
 	const handleCommentChange = (value) => setComment(value);
 
 	const handleSubmit = () => {
-		flatListRef.current.scrollToEnd();
 		createComment();
+		if (allComments.length > 0) {
+			flatListRef.current.scrollToEnd();
+		}
 		setComment("");
 		Keyboard.dismiss();
 	};
