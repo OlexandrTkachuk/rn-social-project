@@ -44,12 +44,6 @@ const RegistrationScreen = ({ navigation }) => {
 	const handleEmailChange = (value) => setEmail(value);
 	const handlePasswordChange = (value) => setPassword(value);
 
-	// const clearForm = () => {
-	// 	setUserName("");
-	// 	setEmail("");
-	// 	setPassword("");
-	// };
-
 	const handleFormSubmit = () => {
 		if (isEmpty) {
 			Alert.alert("Заполните все поля");

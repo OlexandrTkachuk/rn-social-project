@@ -31,6 +31,7 @@ const DefaultScreen = ({ navigation }) => {
 		await firebase
 			.firestore()
 			.collection("Posts")
+			.orderBy("date", "desc")
 			.onSnapshot((data) => {
 				setPosts(
 					data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
@@ -64,7 +65,6 @@ const DefaultScreen = ({ navigation }) => {
 				data={posts}
 				keyExtractor={(item, index) => index.toString()}
 				renderItem={({ item }) => {
-					console.log(item.id);
 					return (
 						<View style={styles.gallery}>
 							<View style={styles.userContainer}>
@@ -110,19 +110,7 @@ const DefaultScreen = ({ navigation }) => {
 										/>
 
 										<Text style={styles.commentText}>
-											{/* {() => {
-												firebase
-													.firestore()
-													.collection("Posts")
-													.doc(item.id)
-													.collection("Comments")
-													.onSnapshot((data) => {
-														let count =
-															data.docs.length;
-														return count;
-													});
-											}} */}
-											count
+											13
 										</Text>
 									</TouchableOpacity>
 

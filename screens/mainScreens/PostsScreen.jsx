@@ -17,7 +17,9 @@ const PostsScreen = () => {
 				component={DefaultScreen}
 			/>
 			<NestedScreen.Screen
-				options={{ headerShown: false }}
+				options={{
+					headerShown: false,
+				}}
 				name="Map"
 				component={MapScreen}
 			/>

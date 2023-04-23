@@ -48,8 +48,8 @@ const useRoute = (isAuth) => {
 					boxShadow: "0px -0.5px 0px rgba(0, 0, 0, 0.3)",
 					backdropFilter: "blur(13.5914px)",
 					backgroundColor: "#FFFFFF",
-					paddingTop: 9,
-					marginBottom: 34,
+					paddingTop: 12,
+					marginBottom: 24,
 					paddingHorizontal: 80,
 				},
 			}}
